@@ -1,0 +1,21 @@
+# primary,secondary  (20 most frequent attribute pairs in the calibration pages)
+class,href
+alt,class
+class,style
+aria-label,class
+aria-hidden,class
+href,rel
+class,id
+media,srcset
+d,fill
+loading,src
+href,target
+height,loading
+class,data-testid
+viewbox,width
+fill,height
+href,hreflang
+src,width
+href,title
+content,name
+class,role
