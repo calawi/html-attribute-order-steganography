@@ -3,7 +3,7 @@
 Code and experimental results for the paper:
 
 > Hanafi, A. A. (2026). *Hiding Encrypted Text in the Order of HTML Attributes:
-> Capacity, Robustness and Detectability on Popular Web Pages.*
+> Capacity, Robustness and Detectability on Popular Homepages.*
 
 The method hides data in the order of the attributes inside HTML tags, after
 encrypting the message with AES. Because a browser builds the same page no matter
@@ -21,10 +21,19 @@ src/
   fetch_corpus.py    downloads homepages of top Tranco sites into data/pages/
   experiments.py     runs the capacity, correctness, robustness, detection tests
   figures.py         draws the two figures from the results
+  head_to_head.py    compares the detectors of earlier work on the same pages (Tables 8, 9)
+  extra_analyses.py  real messages with and without encryption (Table 10), detection on
+                     pages that can hold a message, bit survival and failure causes
+  fetch_fresh.py     downloads the fresh retest sample (Tranco ranks 1,501 to 3,000)
+  fresh_run.py       reruns the unchanged code on the fresh sample
 results/
   per_page.csv       one row per evaluation page (all per-page measurements)
   summary.json       the summary statistics reported in the paper
   key_top20.txt      the 20 most frequent attribute pairs (the key file)
+  head_to_head.*     detector comparison with bootstrap intervals
+  table6_ci.json     bootstrap intervals for Table 6
+  extra.json         results of extra_analyses.py
+  fresh_summary.json, fresh_per_page.csv   results of the fresh retest
   fig1_capacity.png  Figure 1
   fig2_detectability.png  Figure 2
 ```
@@ -41,13 +50,21 @@ pip install -r requirements.txt
 
 # 1. Build the corpus (downloads homepages into data/pages/)
 #    Pass the Tranco top-1m CSV zip, which you can get from https://tranco-list.eu
-python -I src/fetch_corpus.py tranco_top1m.zip data/pages 300 1500
+python src/fetch_corpus.py tranco_top1m.zip data/pages 300 1500
 
 # 2. Run all experiments (writes results/summary.json and results/per_page.csv)
-python -I src/experiments.py data/pages results
+python src/experiments.py data/pages results
 
 # 3. Draw the figures
 python src/figures.py results
+
+# 4. Detector comparison and extra analyses
+python src/head_to_head.py data/pages results
+python src/extra_analyses.py data/pages results
+
+# 5. Retest on fresh pages
+python src/fetch_fresh.py tranco_top1m.zip data_fresh/pages
+python src/fresh_run.py data/pages data_fresh/pages results
 ```
 
 A fixed random seed makes every run reproducible; two full runs produced

@@ -20,16 +20,28 @@ def main():
     S = json.loads((res / "summary.json").read_text(encoding="utf-8"))
 
     # Figure 1: capacity (maximum message length) per page, cumulative share
+    # Redrawn after review comment 28: plain logarithmic axis with labelled ticks,
+    # y axis in percent, one point per message length.
+    from matplotlib.ticker import FixedLocator, NullFormatter, PercentFormatter
     fig, ax = plt.subplots(figsize=(5.2, 3.2))
+    lengths = list(range(1, 3001))
     for col, label, ls in (("msg_auto", "All attribute pairs (auto key)", "-"),
                            ("msg_key20", "Top-20 key file", "--")):
-        vals = sorted(max(int(r[col]), 0) for r in rows)
+        vals = [max(int(r[col]), 0) for r in rows]
         n = len(vals)
-        ax.step(vals, [1 - i / n for i in range(n)], where="post", ls=ls, color="black", label=label)
-    ax.set_xscale("symlog", linthresh=10)
-    ax.set_xlabel("Maximum hidden message (bytes, after encryption overhead)")
-    ax.set_ylabel("Share of pages that can hold it")
-    ax.grid(alpha=0.3)
+        share = [100 * sum(v >= L for v in vals) / n for L in lengths]
+        ax.plot(lengths, share, ls=ls, color="black", label=label)
+    ax.set_xscale("log")
+    ax.set_xlim(1, 3000)
+    ax.set_ylim(0, 70)
+    ticks = [1, 10, 31, 100, 500, 1000, 3000]
+    ax.xaxis.set_major_locator(FixedLocator(ticks))
+    ax.set_xticklabels([str(t) for t in ticks])
+    ax.xaxis.set_minor_formatter(NullFormatter())
+    ax.yaxis.set_major_formatter(PercentFormatter(decimals=0))
+    ax.set_xlabel("Message length (bytes of text, after encryption overhead)")
+    ax.set_ylabel("Pages that can hold it")
+    ax.grid(alpha=0.3, which="major")
     ax.legend(frameon=False)
     fig.tight_layout()
     fig.savefig(res / "fig1_capacity.png")

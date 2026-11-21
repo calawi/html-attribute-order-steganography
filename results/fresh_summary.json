@@ -1,0 +1,45 @@
+{
+ "pages": 637,
+ "pages_with_xml_declaration": 4,
+ "median_bytes": 213283,
+ "median_cap_auto": 582,
+ "median_msg_auto": 31,
+ "share_hold_1B": 0.631083202511774,
+ "share_hold_100B": 0.2543171114599686,
+ "pages_tested": 402,
+ "reveal_ok": 402,
+ "size_ok": 402,
+ "dom_ok": 398,
+ "reveal_errors": {},
+ "robustness": {
+  "lxml_reserialize": 0.7761194029850746,
+  "bs4_reserialize": 0.0,
+  "html5lib_reserialize": 0.7114427860696517,
+  "minify_html": 0.0,
+  "html5lib_sorted_attributes": 0.0
+ },
+ "auc_cons_0.1": {
+  "auc": 0.7076908290184809,
+  "lo": 0.6937583945545372,
+  "hi": 0.7223015434890295,
+  "n": 637
+ },
+ "auc_cons_0.25": {
+  "auc": 0.9060734062976719,
+  "lo": 0.8902456508506071,
+  "hi": 0.9208158767673232,
+  "n": 637
+ },
+ "auc_cons_0.5": {
+  "auc": 0.9785345849485791,
+  "lo": 0.9690395582215497,
+  "hi": 0.987021156125776,
+  "n": 637
+ },
+ "auc_cons_1.0": {
+  "auc": 0.9951142152308333,
+  "lo": 0.9891642165862844,
+  "hi": 0.9996796206708743,
+  "n": 637
+ }
+}
