@@ -130,28 +130,71 @@ def eligibility(html, plist):
     return out
 
 
+def is_ctype(t):
+    return t[0] == "meta" and "http-equiv" in t[1] and "content" in t[1]
+
+
 def first_difference(stego, out):
+    """First change, in document order, that can affect the carrier sequence.
+
+    Tags with two or more attributes are compared. A lookahead separates a tag that
+    was removed or inserted from a tag whose own attributes changed (without it, a
+    removed tag looks like a tag with different attributes).
+    """
     a, b = tag_list(stego), tag_list(out)
     ea, eb = eligibility(stego, a), eligibility(out, b)
-    for x, y, ex_, ey in zip(a, b, ea, eb):
-        if x == y and ex_ == ey:
+    i = j = 0
+    LOOK = 12
+    while i < len(a) and j < len(b):
+        x, y, u, v = a[i], b[j], ea[i], eb[j]
+        if x == y and u == v:
+            i, j = i + 1, j + 1
             continue
-        if not ex_ and not ey and x[0] == y[0]:
-            continue  # neither version is a carrier, so the bits are not affected here
-        if x[0] != y[0]:
-            return "tags added, removed or moved"
-        if x[1] == y[1]:
-            return "quotes or spacing rewritten, so a skipped tag became a carrier" if ey else "tag stopped being a carrier"
-        if len(set(x[1])) < len(x[1]) and list(dict.fromkeys(x[1])) == y[1]:
+        if x == y:
+            return "quotes or spacing rewritten, so a skipped tag became a carrier" if v else "tag stopped being a carrier"
+        dedup = [x[0], list(dict.fromkeys(x[1]))]
+        same_tag = x[0] == y[0]
+        if same_tag and len(set(x[1])) < len(x[1]) and dedup[1] == y[1]:
+            if not u and not v:
+                i, j = i + 1, j + 1
+                continue
             return "duplicate attribute removed, so a skipped tag became a carrier"
-        if set(x[1]) == set(y[1]):
-            return "attribute order changed by the tool"
-        if any(":" in n for n in set(x[1]) - set(y[1])):
+        if same_tag and any(":" in n for n in set(x[1]) - set(y[1])) and [n.split(":")[-1] for n in x[1]] == [n.split(":")[-1] for n in y[1]]:
+            if not u and not v:
+                i, j = i + 1, j + 1
+                continue
             return "namespace prefix dropped"
-        return "attribute added or dropped"
-    if len(a) != len(b):
-        return "tags added, removed or moved"
+        # removed or inserted tag: the next tags line up again after skipping one side
+        rem = next((k for k in range(1, LOOK) if i + k < len(a) and a[i + k] == y and a[i + k + 1:i + k + 3] == b[j + 1:j + 3]), None)
+        ins = next((k for k in range(1, LOOK) if j + k < len(b) and b[j + k] == x and b[j + k + 1:j + k + 3] == a[i + 1:i + 3]), None)
+        if rem is not None and (ins is None or rem <= ins):
+            if not any(ea[i:i + rem]):
+                i += rem
+                continue
+            return "content-type meta tag removed" if all(is_ctype(t) for t in a[i:i + rem]) else "tag added, removed or moved"
+        if ins is not None:
+            if not any(eb[j:j + ins]):
+                j += ins
+                continue
+            return "tag added, removed or moved"
+        if not same_tag:
+            return "tag added, removed or moved"
+        if not u and not v:
+            i, j = i + 1, j + 1
+            continue
+        if sorted(x[1]) == sorted(y[1]):
+            return "attribute order changed by the tool"
+        if not u and v:
+            return "malformed attribute dropped or renamed, so a skipped tag became a carrier"
+        return "attribute dropped or renamed"
+    if any(ea[i:]) or any(eb[j:]):
+        return "tag added, removed or moved"
     return "other"
+
+# kept for tests: the same serializer without lxml's default removal of the content-type tag
+def lxml_keep_meta(h):
+    import lxml.html
+    return lxml.html.tostring(lxml.html.document_fromstring(h), encoding="unicode", include_meta_content_type=True)
 
 
 def worker_survival(args):
@@ -193,6 +236,7 @@ def worker_survival(args):
         if not ok:
             r["cause"] = first_difference(stego, out)
         res[tname] = r
+    res["_lxml_keep_meta_ok"] = hs.read_bits(lxml_keep_meta(stego), n_bits) == want
     return name, res
 
 # ------------------------------------------------------------------ main
@@ -255,6 +299,9 @@ def main():
                     "share_failed_with_prefix_ge_half": float(np.mean([r["prefix"] >= 0.5 for r in fails])) if fails else None,
                     "causes": dict(Counter(r["cause"] for r in fails))}
     out["C_survival"] = C
+    out["C_lxml_keep_meta_ok"] = sum(o["_lxml_keep_meta_ok"] for _, o in surv)
+    out["C_lxml_keep_meta_rescued"] = sum(o["_lxml_keep_meta_ok"] and not o["lxml_reserialize"]["ok"] for _, o in surv)
+    out["C_lxml_meta_cause_rescued"] = sum(o["_lxml_keep_meta_ok"] for _, o in surv if o["lxml_reserialize"].get("cause") == "content-type meta tag removed")
     print("survival done", round(time.time() - t0), "s", flush=True)
 
     # D. key derivation time

@@ -5,6 +5,10 @@ Code and experimental results for the paper:
 > Hanafi, A. A. (2026). *Hiding Encrypted Text in the Order of HTML Attributes:
 > Capacity, Robustness and Detectability on Popular Homepages.*
 
+The embedding is the pairwise attribute-order method of Garg (2011), *A Novel Text
+Steganography Technique Based on Html Documents*, IJAST 35, 129-138. This repository
+replaces its Playfair cipher with AES and evaluates it on real pages.
+
 The method hides data in the order of the attributes inside HTML tags, after
 encrypting the message with AES. Because a browser builds the same page no matter
 how the attributes are ordered, the change is invisible on screen and the file

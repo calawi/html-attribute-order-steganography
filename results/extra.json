@@ -168,11 +168,12 @@
    "median_prefix_failed": 0.05447065820777161,
    "share_failed_with_prefix_ge_half": 0.1774193548387097,
    "causes": {
-    "attribute added or dropped": 24,
+    "malformed attribute dropped or renamed, so a skipped tag became a carrier": 4,
     "duplicate attribute removed, so a skipped tag became a carrier": 17,
     "quotes or spacing rewritten, so a skipped tag became a carrier": 10,
-    "attribute order changed by the tool": 1,
-    "tags added, removed or moved": 10
+    "content-type meta tag removed": 23,
+    "attribute dropped or renamed": 2,
+    "tag added, removed or moved": 6
    }
   },
   "bs4_reserialize": {
@@ -185,7 +186,7 @@
    "share_failed_with_prefix_ge_half": 0.0,
    "causes": {
     "attribute order changed by the tool": 286,
-    "tags added, removed or moved": 1
+    "tag added, removed or moved": 1
    }
   },
   "html5lib_reserialize": {
@@ -197,11 +198,10 @@
    "median_prefix_failed": 0.1352549889135255,
    "share_failed_with_prefix_ge_half": 0.2,
    "causes": {
-    "namespace prefix dropped": 37,
+    "namespace prefix dropped": 38,
     "duplicate attribute removed, so a skipped tag became a carrier": 17,
     "quotes or spacing rewritten, so a skipped tag became a carrier": 10,
-    "tags added, removed or moved": 15,
-    "attribute added or dropped": 1
+    "tag added, removed or moved": 15
    }
   },
   "minify_html": {
@@ -214,8 +214,8 @@
    "share_failed_with_prefix_ge_half": 0.0,
    "causes": {
     "attribute order changed by the tool": 275,
-    "attribute added or dropped": 10,
-    "tags added, removed or moved": 2
+    "attribute dropped or renamed": 10,
+    "tag added, removed or moved": 2
    }
   },
   "html5lib_sorted_attributes": {
@@ -228,9 +228,12 @@
    "share_failed_with_prefix_ge_half": 0.0,
    "causes": {
     "attribute order changed by the tool": 286,
-    "tags added, removed or moved": 1
+    "tag added, removed or moved": 1
    }
   }
  },
- "D_kdf_median_s": 0.050707800008240156
+ "C_lxml_keep_meta_ok": 240,
+ "C_lxml_keep_meta_rescued": 15,
+ "C_lxml_meta_cause_rescued": 15,
+ "D_kdf_median_s": 0.07399494999845047
 }
