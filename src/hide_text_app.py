@@ -16,7 +16,7 @@ import htmlstego as hs  # noqa: E402
 
 
 def read(path):
-    return Path(path).read_text(encoding="utf-8")
+    return Path(path).read_bytes().decode("utf-8")  # keeps the line endings of the page
 
 
 def read_text_file(path):
@@ -67,7 +67,7 @@ def cli(args):
             print("The message is too long for this page.")
             print(capacity_text(html))
             return
-        Path(out).write_text(stego, encoding="utf-8")
+        Path(out).write_bytes(stego.encode("utf-8"))
         swapped = sum(a != b for a, b in zip(hs.read_bits(html), hs.read_bits(stego)))
         print(f"Hidden. Saved to {out}")
         print(f"Original size: {len(html.encode('utf-8'))} bytes | New size: {len(stego.encode('utf-8'))} bytes | "
@@ -180,7 +180,7 @@ def gui():
         out = filedialog.asksaveasfilename(initialdir=src.parent, initialfile=src.stem + "_stego.html",
                                            defaultextension=".html", filetypes=[("HTML files", "*.html")])
         if out:
-            Path(out).write_text(stego, encoding="utf-8")
+            Path(out).write_bytes(stego.encode("utf-8"))
             messagebox.showinfo("Hide", f"Message hidden and saved to:\n{out}\n\n"
                                         f"File size is unchanged: {len(stego.encode('utf-8'))} bytes.")
 

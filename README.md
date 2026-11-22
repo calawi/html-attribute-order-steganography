@@ -15,9 +15,13 @@ how the attributes are ordered, the change is invisible on screen and the file
 size does not change. This repository lets anyone reproduce the paper's
 measurements of capacity, robustness and detectability.
 
+**To download and test the tool step by step, see the [user guide](USER_GUIDE.md).**
+
 ## What is here
 
 ```
+USER_GUIDE.md        how to download and test the tool, step by step
+examples/            a sample page and a sample text file for testing
 src/
   htmlstego.py       the method: AES encryption + attribute-order hiding
   test_basic.py      12 quick checks of the tool, no downloads needed

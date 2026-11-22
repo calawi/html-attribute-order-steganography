@@ -30,7 +30,7 @@ def show_pairs(html, n=5, label="First carrier pairs in the page"):
 
 
 def hide(page, out, message, password):
-    html = Path(page).read_text(encoding="utf-8")
+    html = Path(page).read_bytes().decode("utf-8")
     print(LINE)
     print("STEP 1  The secret message")
     raw = message.encode("utf-8")
@@ -69,7 +69,7 @@ def hide(page, out, message, password):
     stego = hs.write_bits(html, bits)
     show_pairs(stego, label="   After (stego page)")
     swapped = sum(a != b for a, b in zip(hs.read_bits(html), hs.read_bits(stego)))
-    Path(out).write_text(stego, encoding="utf-8")
+    Path(out).write_bytes(stego.encode("utf-8"))
     print(f"   {swapped} pairs were swapped; the others already had the right order.")
     print(f"   File size before {len(html.encode())} bytes, after {len(stego.encode())} bytes.")
     print(f"   Saved: {out}")
@@ -77,7 +77,7 @@ def hide(page, out, message, password):
 
 
 def reveal(stego_path, password):
-    html = Path(stego_path).read_text(encoding="utf-8")
+    html = Path(stego_path).read_bytes().decode("utf-8")
     print(LINE)
     print("STEP 1  Read the order of every attribute pair")
     sl = show_pairs(html)
