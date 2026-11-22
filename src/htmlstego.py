@@ -1,7 +1,7 @@
 """HTML attribute-order steganography with AES encryption.
 
-Re-implementation of the method in Hanafi (2016), which builds on the
-attribute-order technique of Garg (2011):
+Implements the pairwise attribute-order technique of Garg (2011), with AES in
+place of the Playfair cipher:
 
   1. The secret message is encrypted with AES-256-CBC (PKCS7 padding).
      The key comes from a password through PBKDF2-HMAC-SHA256.
@@ -15,7 +15,7 @@ attribute-order technique of Garg (2011):
 
 Two kinds of key are supported:
   * a key file: an ordered list of (primary, secondary) attribute pairs, as in
-    the 2016 system;
+    Garg (2011);
   * "auto": in every tag the attribute names are sorted alphabetically and
     split into consecutive disjoint pairs. The receiver can rebuild this key
     from the stego page, because reordering does not change which attributes
