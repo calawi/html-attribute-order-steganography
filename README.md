@@ -20,6 +20,7 @@ measurements of capacity, robustness and detectability.
 ```
 src/
   htmlstego.py       the method: AES encryption + attribute-order hiding
+  test_basic.py      12 quick checks of the tool, no downloads needed
   hide_text_app.py   a small app (window + command line) to hide/reveal text
   explain_steps.py   prints each step of hiding and revealing, for teaching
   fetch_corpus.py    downloads homepages of top Tranco sites into data/pages/
@@ -28,6 +29,7 @@ src/
   head_to_head.py    compares the detectors of earlier work on the same pages (Tables 8, 9)
   extra_analyses.py  real messages with and without encryption (Table 10), detection on
                      pages that can hold a message, bit survival and failure causes
+  table6_ci.py       bootstrap intervals for Table 6
   fetch_fresh.py     downloads the fresh retest sample (Tranco ranks 1,501 to 3,000)
   fresh_run.py       reruns the unchanged code on the fresh sample
 results/
@@ -52,6 +54,9 @@ are what the paper reports.
 ```bash
 pip install -r requirements.txt
 
+# 0. Check that the tool works
+python src/test_basic.py
+
 # 1. Build the corpus (downloads homepages into data/pages/)
 #    Pass the Tranco top-1m CSV zip, which you can get from https://tranco-list.eu
 python src/fetch_corpus.py tranco_top1m.zip data/pages 300 1500
@@ -63,6 +68,7 @@ python src/experiments.py data/pages results
 python src/figures.py results
 
 # 4. Detector comparison and extra analyses
+python src/table6_ci.py results
 python src/head_to_head.py data/pages results
 python src/extra_analyses.py data/pages results
 
