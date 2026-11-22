@@ -3,10 +3,10 @@
 Detectors (all scored so that a higher value means "more likely stego"):
   W      Polak & Kotulski (2010) as described in Sedeeq et al. (2017a): share of
          attribute pairs, per tag name, that occur in a non-predominant order.
-  SD     Sedeeq et al. (2016), our reading of the description in Sedeeq et al.
-         (2017a): standard deviation of the positions of each attribute over all
-         tags with two or more attributes, averaged over attributes (weighted by
-         occurrences).
+  SD     Sedeeq et al. (2016), equations 2 to 5: square root of the sum, over all
+         attributes, of the variance of the attribute's positions in tags with two
+         or more attributes. The original method monitors one page over time; here
+         it is used on single pages, as Sedeeq et al. (2017a) did.
   APCC   Sedeeq et al. (2017a): Attribute Position Changes Count (their Algorithm 1)
          as a feature vector over the K most frequent attributes, with the three
          classifiers they used (MLP, SVM, Naive Bayes).
@@ -23,6 +23,7 @@ embedding models, each at 10, 25, 50 and 100% of capacity with random bits:
 Usage: python head_to_head.py <pages_dir> <results_dir> [limit]
 """
 import json
+import math
 import os
 import random
 import sys
@@ -75,12 +76,7 @@ def stat_SD(tags):
             continue
         for k, a in enumerate(t.names):
             pos[a].append(k)
-    num = den = 0.0
-    for a, v in pos.items():
-        if len(v) >= 2:
-            num += len(v) * float(np.std(v))
-            den += len(v)
-    return num / den if den else 0.0
+    return math.sqrt(sum(float(np.var(v)) for v in pos.values()))
 
 
 def stat_APCC(tags):
@@ -228,6 +224,9 @@ def main():
         for det in ("W", "SD", "OC", "WN"):
             m = metrics([got[n]["clean"][det] for n in cal_n], [got[n][key][det] for n in cal_n],
                         [got[n]["clean"][det] for n in ev_n], [got[n][key][det] for n in ev_n])
+            # share of stego pages that score above their own clean version (an ideal
+            # case of the page-over-time monitoring the W and SD methods were made for)
+            m["above_own"] = float(np.mean([got[n][key][det] > got[n]["clean"][det] for n in ev_n]))
             rows.append({"model": model, "rate": float(rate), "detector": det, **m})
         for K in KS:
             Xc = [vec(got[n]["clean"]["APCC"], top[K]) for n in cal_n]
@@ -246,9 +245,9 @@ def main():
     (res / "head_to_head.json").write_text(json.dumps({"rows": rows, "top_attributes": top, "n_cal": len(cal), "n_eval": len(ev),
                                                       "boot": BOOT, "seed": SEED}, indent=1), encoding="utf-8")
     with open(res / "head_to_head.csv", "w", encoding="utf-8") as fh:
-        fh.write("model,rate,detector,auc,ci_lo,ci_hi,accuracy,tpr_at_cal_1pct,fpr_at_cal_1pct\n")
+        fh.write("model,rate,detector,auc,ci_lo,ci_hi,accuracy,tpr_at_cal_1pct,fpr_at_cal_1pct,above_own_clean_page\n")
         for r in rows:
-            fh.write(f"{r['model']},{r['rate']},{r['detector']},{r['auc']:.4f},{r['lo']:.4f},{r['hi']:.4f},{r['acc']:.4f},{r['tpr1']:.4f},{r['fpr1']:.4f}\n")
+            fh.write(f"{r['model']},{r['rate']},{r['detector']},{r['auc']:.4f},{r['lo']:.4f},{r['hi']:.4f},{r['acc']:.4f},{r['tpr1']:.4f},{r['fpr1']:.4f},{('%.4f' % r['above_own']) if 'above_own' in r else ''}\n")
     print("saved", len(rows), "rows")
 
 
