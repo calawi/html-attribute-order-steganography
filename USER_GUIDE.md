@@ -143,6 +143,7 @@ python src\hide_text_app.py reveal processed.html test123
 | Tables 8 and 9 | Yes, to run again | results in `results\head_to_head.csv` |
 | Table 10 | Yes, to run again | results in `results\extra.json` |
 | Table 11 | Yes, to run again | results in `results\overhead.json` |
+| Table 12 | Yes, to run again | results in `results\careful_sender.json` |
 | Fresh sample (Section 5.2) | Yes, to run again | results in `results\fresh_summary.json` |
 
 These two commands work without the pages. They write their output into `results`:

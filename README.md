@@ -34,6 +34,7 @@ src/
   extra_analyses.py  real messages with and without encryption (Table 10), detection on
                      pages that can hold a message, bit survival and failure causes
   overhead_test.py   five encryption layouts for the same message (Table 11)
+  careful_sender.py  two embeddings that try to keep the page's statistics (Table 12)
   table6_ci.py       bootstrap intervals for Table 6
   fetch_fresh.py     downloads the fresh retest sample (Tranco ranks 1,501 to 3,000)
   fresh_run.py       reruns the unchanged code on the fresh sample
@@ -45,6 +46,7 @@ results/
   table6_ci.json     bootstrap intervals for Table 6
   extra.json         results of extra_analyses.py
   overhead.json      results of overhead_test.py
+  careful_sender.json  results of careful_sender.py
   fresh_summary.json, fresh_per_page.csv   results of the fresh retest
   fig1_capacity.png  Figure 1
   fig2_detectability.png  Figure 2
@@ -78,6 +80,7 @@ python src/table6_ci.py results
 python src/head_to_head.py data/pages results
 python src/extra_analyses.py data/pages results
 python src/overhead_test.py data/pages results
+python src/careful_sender.py data/pages results
 
 # 5. Retest on fresh pages
 python src/fetch_fresh.py tranco_top1m.zip data_fresh/pages
